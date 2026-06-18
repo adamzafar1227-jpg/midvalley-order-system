@@ -15,6 +15,7 @@ import {
   Upload,
   Image as ImageIcon,
   AlertTriangle,
+  AlertCircle,
   X,
   Pencil
 } from 'lucide-react';
