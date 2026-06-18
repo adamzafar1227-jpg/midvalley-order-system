@@ -120,7 +120,14 @@ export default function AdminTables() {
     if (!tableToDelete) return;
     const { error } = await supabase.from('tables').delete().eq('id', tableToDelete.id);
     if (error) {
-      setAlertConfig({ title: 'Gagal', message: 'Gagal menghapus meja.' });
+      if (error.code === '23503') {
+        setAlertConfig({ 
+          title: 'Tidak Dapat Dihapus', 
+          message: 'Meja ini memiliki riwayat pesanan dan tidak dapat dihapus.' 
+        });
+      } else {
+        setAlertConfig({ title: 'Gagal', message: 'Gagal menghapus meja.' });
+      }
     } else {
       const remaining = tables.filter(t => t.id !== tableToDelete.id);
       setTables(remaining);
