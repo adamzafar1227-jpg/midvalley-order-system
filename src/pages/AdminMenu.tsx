@@ -28,6 +28,7 @@ export default function AdminMenu() {
   const [selectedCategory, setSelectedCategory] = useState('All');
   const [searchQuery, setSearchQuery] = useState('');
   const [loading, setLoading] = useState(true);
+  const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
   
   // New Item Form State
   const [showAddForm, setShowAddForm] = useState(false);
@@ -66,7 +67,7 @@ export default function AdminMenu() {
 
       setImageUrl(data.publicUrl);
     } catch (error: any) {
-      alert('Error uploading image: ' + error.message);
+      setAlertConfig({ title: 'Gagal', message: 'Gagal mengunggah gambar: ' + error.message });
     } finally {
       setUploading(false);
     }
@@ -127,7 +128,10 @@ export default function AdminMenu() {
       .update({ is_available: !item.isAvailable })
       .eq('id', itemId);
 
-    if (error) return alert('Update failed');
+    if (error) {
+      setAlertConfig({ title: 'Gagal', message: 'Gagal memperbarui ketersediaan stok.' });
+      return;
+    }
 
     setItems(prev => 
       prev.map(it => it.id === itemId ? { ...it, isAvailable: !it.isAvailable } : it)
@@ -145,7 +149,7 @@ export default function AdminMenu() {
 
     if (error) {
       console.error("Supabase error deleting item:", error);
-      return alert(`Delete failed: ${error.message}`);
+      return setAlertConfig({ title: 'Gagal', message: `Gagal menghapus item: ${error.message}` });
     }
 
     setItems(prev => prev.filter(it => it.id !== itemToDelete.id));
@@ -155,8 +159,8 @@ export default function AdminMenu() {
   // Add Item handler
   const handleAddItem = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!name || !price) return alert('Item name and price are required.');
-    if (!user?.venueId) return alert('Session error: No venue ID found. Please refresh and try again.');
+    if (!name || !price) return setAlertConfig({ title: 'Peringatan', message: 'Nama item dan harga wajib diisi.' });
+    if (!user?.venueId) return setAlertConfig({ title: 'Sesi Berakhir', message: 'ID venue tidak ditemukan. Silakan muat ulang halaman.' });
 
     const { data, error } = await supabase.from('menu_items').insert([{
       venue_id: user.venueId,
@@ -170,7 +174,7 @@ export default function AdminMenu() {
 
     if (error) {
       console.error('Supabase insert failed:', error);
-      return alert(`Failed to add item: ${error.message}`);
+      return setAlertConfig({ title: 'Gagal', message: `Gagal menambah item: ${error.message}` });
     }
 
     if (!data) return;
@@ -539,7 +543,7 @@ export default function AdminMenu() {
                 <button
                   id="btn-confirm-delete"
                   onClick={executeDelete}
-                  className="flex-1 bg-rose-600 hover:bg-rose-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow-sm cursor-pointer"
+                  className="flex-1 bg-[#DC2626] hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow-sm cursor-pointer"
                 >
                   Hapus
                 </button>
@@ -547,6 +551,48 @@ export default function AdminMenu() {
               
               <button 
                 onClick={() => setItemToDelete(null)}
+                className="absolute top-4 right-4 text-slate-300 hover:text-slate-500 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Alert Modal */}
+      <AnimatePresence>
+        {alertConfig && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-950/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="bg-white rounded-2xl max-w-sm w-full p-6 text-center border border-slate-100 shadow-xl"
+            >
+              <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 mx-auto mb-4">
+                <AlertCircle className="w-7 h-7" />
+              </div>
+              
+              <h3 className="text-lg font-black text-slate-900">{alertConfig.title}</h3>
+              <p className="text-xs text-slate-500 mt-2">{alertConfig.message}</p>
+
+              <div className="mt-8">
+                <button
+                  onClick={() => setAlertConfig(null)}
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition-colors cursor-pointer"
+                >
+                  Oke
+                </button>
+              </div>
+              
+              <button 
+                onClick={() => setAlertConfig(null)}
                 className="absolute top-4 right-4 text-slate-300 hover:text-slate-500 transition-colors"
               >
                 <X size={18} />

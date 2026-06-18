@@ -32,6 +32,7 @@ export default function AdminDashboard() {
     pendingPayments: 0
   });
   const [popularItems, setPopularItems] = useState<{ name: string; count: number }[]>([]);
+  const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
 
   const formatCurrency = (amount: number | string) => {
     const value = typeof amount === 'string' ? parseFloat(amount) : amount;
@@ -141,7 +142,10 @@ export default function AdminDashboard() {
     `).join('');
 
     const printWindow = window.open('', '_blank', 'width=350,height=600');
-    if (!printWindow) return alert('Pop-up blocked! Please allow pop-ups to print receipts.');
+    if (!printWindow) {
+      setAlertConfig({ title: 'Pop-up Diblokir', message: 'Harap izinkan pop-up untuk mencetak struk belanja.' });
+      return;
+    }
 
     printWindow.document.write(`
       <html>
@@ -198,7 +202,10 @@ export default function AdminDashboard() {
       .update({ status: newStatus })
       .eq('id', orderId);
 
-    if (error) return alert('Failed to update status');
+    if (error) {
+      setAlertConfig({ title: 'Gagal', message: 'Gagal memperbarui status pesanan.' });
+      return;
+    }
 
     const updatedOrders = orders.map(ord => 
       ord.id === orderId ? { ...ord, status: newStatus } : ord
@@ -391,6 +398,48 @@ export default function AdminDashboard() {
           </div>
         </div>
       </div>
+
+      {/* Alert Modal */}
+      <AnimatePresence>
+        {alertConfig && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-950/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="bg-white rounded-2xl max-w-sm w-full p-6 text-center border border-slate-100 shadow-xl"
+            >
+              <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 mx-auto mb-4">
+                <AlertCircle className="w-7 h-7" />
+              </div>
+              
+              <h3 className="text-lg font-black text-slate-900">{alertConfig.title}</h3>
+              <p className="text-xs text-slate-500 mt-2">{alertConfig.message}</p>
+
+              <div className="mt-8">
+                <button
+                  onClick={() => setAlertConfig(null)}
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition-colors cursor-pointer"
+                >
+                  Oke
+                </button>
+              </div>
+              
+              <button 
+                onClick={() => setAlertConfig(null)}
+                className="absolute top-4 right-4 text-slate-300 hover:text-slate-500 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AdminLayout>
   );
 }

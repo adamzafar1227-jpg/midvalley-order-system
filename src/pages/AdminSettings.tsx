@@ -8,14 +8,17 @@ import {
   Lock, 
   User,
   Check,
-  AlertCircle
+  AlertCircle,
+  X
 } from 'lucide-react';
+import { motion, AnimatePresence } from 'motion/react';
 
 export default function AdminSettings() {
   const { user } = useAuth();
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
   
   // Form States
   const [venueData, setVenueData] = useState({
@@ -67,7 +70,7 @@ export default function AdminSettings() {
       })
       .eq('id', user.venueId);
 
-    if (error) alert(error.message);
+    if (error) setAlertConfig({ title: 'Gagal', message: error.message });
     else {
       setSuccess('branding');
       setTimeout(() => setSuccess(null), 2000);
@@ -87,7 +90,7 @@ export default function AdminSettings() {
       })
       .eq('id', user.venueId);
 
-    if (error) alert(error.message);
+    if (error) setAlertConfig({ title: 'Gagal', message: error.message });
     else {
       setSuccess('preferences');
       setTimeout(() => setSuccess(null), 2000);
@@ -103,7 +106,7 @@ export default function AdminSettings() {
       password: newPassword
     });
 
-    if (error) alert(error.message);
+    if (error) setAlertConfig({ title: 'Gagal', message: error.message });
     else {
       setSuccess('password');
       setNewPassword('');
@@ -202,6 +205,48 @@ export default function AdminSettings() {
           </div>
         </div>
       </div>
+
+      {/* Alert Modal */}
+      <AnimatePresence>
+        {alertConfig && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-950/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="bg-white rounded-2xl max-w-sm w-full p-6 text-center border border-slate-100 shadow-xl"
+            >
+              <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 mx-auto mb-4">
+                <AlertCircle className="w-7 h-7" />
+              </div>
+              
+              <h3 className="text-lg font-black text-slate-900">{alertConfig.title}</h3>
+              <p className="text-xs text-slate-500 mt-2">{alertConfig.message}</p>
+
+              <div className="mt-8">
+                <button
+                  onClick={() => setAlertConfig(null)}
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition-colors cursor-pointer"
+                >
+                  Oke
+                </button>
+              </div>
+              
+              <button 
+                onClick={() => setAlertConfig(null)}
+                className="absolute top-4 right-4 text-slate-300 hover:text-slate-500 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AdminLayout>
   );
 }

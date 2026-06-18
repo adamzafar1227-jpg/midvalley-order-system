@@ -25,6 +25,8 @@ export default function AdminTables() {
   const [selectedTableId, setSelectedTableId] = useState<string>('');
   const [venue, setVenue] = useState<Venue | null>(null);
   const [loading, setLoading] = useState(true);
+  const [tableToDelete, setTableToDelete] = useState<Table | null>(null);
+  const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
 
   // Add Table state
   const [newTableNum, setNewTableNum] = useState('');
@@ -80,7 +82,7 @@ export default function AdminTables() {
     );
 
     if (exists) {
-      alert('This table number already exists in your workspace.');
+      setAlertConfig({ title: 'Gagal', message: 'Nomor meja ini sudah terdaftar di sistem.' });
       return;
     }
 
@@ -93,7 +95,10 @@ export default function AdminTables() {
       table_number: tableNumberDisplay
     }).select().single();
 
-    if (error) return alert('Failed to register table');
+    if (error) {
+      setAlertConfig({ title: 'Gagal', message: 'Gagal mendaftarkan meja ke database.' });
+      return;
+    }
 
     const newTable: Table = {
       id: data.id,
@@ -108,16 +113,19 @@ export default function AdminTables() {
     setTimeout(() => setCreateSuccess(false), 1500);
   };
 
-  const deleteTable = async (tableId: string) => {
-    if (!confirm('Remove this table?')) return;
-    const { error } = await supabase.from('tables').delete().eq('id', tableId);
-    if (error) return alert('Delete failed');
-
-    const remaining = tables.filter(t => t.id !== tableId);
-    setTables(remaining);
-    if (selectedTableId === tableId && remaining.length > 0) {
-      setSelectedTableId(remaining[0].id);
+  const confirmDeleteTable = async () => {
+    if (!tableToDelete) return;
+    const { error } = await supabase.from('tables').delete().eq('id', tableToDelete.id);
+    if (error) {
+      setAlertConfig({ title: 'Gagal', message: 'Gagal menghapus meja.' });
+    } else {
+      const remaining = tables.filter(t => t.id !== tableToDelete.id);
+      setTables(remaining);
+      if (selectedTableId === tableToDelete.id && remaining.length > 0) {
+        setSelectedTableId(remaining[0].id);
+      }
     }
+    setTableToDelete(null);
   };
 
   const copyUrlToClipboard = () => {
@@ -144,7 +152,7 @@ export default function AdminTables() {
       document.body.removeChild(downloadLink);
     } catch (error) {
       console.error('Error generating PNG:', error);
-      alert('Failed to generate the PNG card preview.');
+      setAlertConfig({ title: 'Gagal', message: 'Gagal membuat pratinjau kartu PNG.' });
     }
   };
 
@@ -193,7 +201,7 @@ export default function AdminTables() {
                       id={`delete-table-btn-${table.id}`}
                       onClick={(e) => {
                         e.stopPropagation();
-                        deleteTable(table.id);
+                        setTableToDelete(table);
                       }}
                       className="text-slate-300 hover:text-rose-500 p-1.5 rounded-md transition-colors cursor-pointer"
                       title="Delete table entry"
@@ -422,6 +430,91 @@ export default function AdminTables() {
         </div>
 
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {tableToDelete && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-950/60 flex items-center justify-center p-4 z-50 backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="bg-white rounded-2xl max-w-sm w-full p-6 text-center border border-slate-100 shadow-xl"
+            >
+              <div className="w-14 h-14 bg-rose-50 rounded-full flex items-center justify-center text-rose-500 mx-auto mb-4">
+                <AlertTriangle className="w-7 h-7" />
+              </div>
+              
+              <h3 className="text-lg font-black text-slate-900">Hapus Meja?</h3>
+              <p className="text-xs text-slate-500 mt-2">
+                Tindakan ini tidak dapat dibatalkan.
+              </p>
+
+              <div className="flex gap-3 mt-8">
+                <button
+                  onClick={() => setTableToDelete(null)}
+                  className="flex-1 border border-slate-200 hover:bg-slate-50 text-slate-600 font-bold py-2.5 rounded-xl text-xs transition-colors cursor-pointer"
+                >
+                  Batal
+                </button>
+                <button
+                  onClick={confirmDeleteTable}
+                  className="flex-1 bg-[#DC2626] hover:bg-red-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow-sm cursor-pointer"
+                >
+                  Hapus
+                </button>
+              </div>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Alert Modal */}
+      <AnimatePresence>
+        {alertConfig && (
+          <motion.div 
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 bg-slate-950/60 flex items-center justify-center p-4 z-[60] backdrop-blur-sm"
+          >
+            <motion.div 
+              initial={{ scale: 0.95, y: 10 }}
+              animate={{ scale: 1, y: 0 }}
+              exit={{ scale: 0.95, y: 10 }}
+              className="bg-white rounded-2xl max-w-sm w-full p-6 text-center border border-slate-100 shadow-xl"
+            >
+              <div className="w-14 h-14 bg-amber-50 rounded-full flex items-center justify-center text-amber-500 mx-auto mb-4">
+                <AlertCircle className="w-7 h-7" />
+              </div>
+              
+              <h3 className="text-lg font-black text-slate-900">{alertConfig.title}</h3>
+              <p className="text-xs text-slate-500 mt-2">{alertConfig.message}</p>
+
+              <div className="mt-8">
+                <button
+                  onClick={() => setAlertConfig(null)}
+                  className="w-full bg-slate-900 hover:bg-slate-800 text-white font-bold py-2.5 rounded-xl text-xs transition-colors cursor-pointer"
+                >
+                  Oke
+                </button>
+              </div>
+              
+              <button 
+                onClick={() => setAlertConfig(null)}
+                className="absolute top-4 right-4 text-slate-300 hover:text-slate-500 transition-colors"
+              >
+                <X size={18} />
+              </button>
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </AdminLayout>
   );
 }
