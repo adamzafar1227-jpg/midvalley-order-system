@@ -123,13 +123,11 @@ export default function AdminLayout({ children, title, subtitle }: AdminLayoutPr
       <aside className="hidden md:flex md:w-64 md:flex-col bg-[#1A1A1A] text-slate-600 border-r border-slate-900 flex-shrink-0">
         <div className="p-6 border-b border-slate-800 bg-[#1A1A1A] flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <span className="w-8 h-8 rounded-lg bg-[#FF6B35] flex items-center justify-center text-white font-extrabold text-sm tracking-tighter">
-              QR
-            </span>
-            <div className="flex-1">
-              <span className="text-white font-bold text-sm block">{theme.brandName} Admin</span>
-              <span className="text-[10px] text-slate-400 block">SaaS Dashboard</span>
-            </div>
+            <img
+              src="/Mid Valley.jpeg"
+              alt="Mid Valley.png"
+              className="max-h-[40px] object-contain"
+            />
           </div>
           <div className="w-2 h-2 rounded-full bg-[#FF6B35] animate-ping" />
         </div>
@@ -221,10 +219,11 @@ export default function AdminLayout({ children, title, subtitle }: AdminLayoutPr
         {/* Mobile Header Menu bar */}
         <header className="md:hidden bg-white text-slate-800 border-b border-slate-200 p-4 flex items-center justify-between shadow-xs">
           <div className="flex items-center gap-2">
-            <span className="w-7 h-7 rounded-md bg-indigo-600 flex items-center justify-center text-white font-black text-xs">
-              QR
-            </span>
-            <span className="font-extrabold text-sm tracking-tight text-slate-800">{theme.brandName} Admin</span>
+            <img
+              src="/Mid Valley.jpeg"
+              alt="Mid Valley"
+              className="max-h-[40px] object-contain"
+            />
           </div>
 
           <button

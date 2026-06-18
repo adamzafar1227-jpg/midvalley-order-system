@@ -1,6 +1,6 @@
 export const theme = {
-  primaryColor: '#FF6B35',
-  primaryColorDark: '#E55A2B',
+  primaryColor: '#1A1A1A',
+  primaryColorDark: '#000000',
   backgroundColor: '#FFF8F3',
-  brandName: 'Ordio',
+  brandName: 'MID VALLEY Coffee & Eatery',
 };

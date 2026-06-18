@@ -45,13 +45,14 @@ export default function AdminRegister() {
       {/* Visual Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
         <div className="flex flex-col items-center gap-2 mb-6">
-          <div className="w-12 h-12 rounded-xl flex items-center justify-center text-white shadow-lg" style={{ backgroundColor: theme.primaryColor, boxShadow: `0 10px 15px -3px ${theme.primaryColor}33` }}>
-            <QrCode size={28} />
-          </div>
-          <span className="text-2xl font-black tracking-tight text-slate-900">{theme.brandName}</span>
+          <img
+            src="/Mid Valley.jpeg"
+            alt="Mid Valley"
+            className="max-h-[40px] object-contain rounded-xl shadow-lg mx-auto"
+          />
         </div>
         <h2 className="text-center text-3xl font-black tracking-tight text-slate-900">
-          Daftar ke {theme.brandName}
+          Daftar ke Mid Valley
         </h2>
         <p className="mt-2 text-center text-sm text-slate-600">
           Luncurkan menu digital restoran Anda dalam hitungan detik
