@@ -16,7 +16,9 @@ import {
   ExternalLink,
   Utensils,
   Sparkles,
-  AlertTriangle
+  AlertTriangle,
+  AlertCircle,
+  X
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
