@@ -7,7 +7,7 @@ import {
   Plus, 
   Trash2, 
   ToggleLeft, 
-  ToggleRight,
+  ToggleRight, 
   Sparkles,
   Utensils,
   Check,
@@ -225,10 +225,10 @@ export default function AdminMenu() {
     };
 
     if (editingItem) {
-      setItems(prev => prev.map(it => it.id === processedItem.id ? processedItem : it));
+      setItems(prev => prev.map(it => it.id === newItem.id ? newItem : it));
       setEditingItem(null); // Exit edit mode
     } else {
-      setItems(prev => [processedItem, ...prev]);
+      setItems(prev => [newItem, ...prev]);
     }
     setFormSuccess(true);
     
