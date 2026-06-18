@@ -15,7 +15,8 @@ import {
   Upload,
   Image as ImageIcon,
   AlertTriangle,
-  X
+  X,
+  Pencil
 } from 'lucide-react';
 import { motion, AnimatePresence } from 'motion/react';
 
@@ -41,6 +42,7 @@ export default function AdminMenu() {
   const [formSuccess, setFormSuccess] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [itemToDelete, setItemToDelete] = useState<MenuItem | null>(null);
+  const [editingItem, setEditingItem] = useState<MenuItem | null>(null);
 
   const formatPrice = (price: number) => {
     return 'Rp ' + price.toLocaleString('id-ID');
@@ -72,6 +74,26 @@ export default function AdminMenu() {
       setUploading(false);
     }
   };
+
+  useEffect(() => {
+    if (editingItem) {
+      setName(editingItem.name);
+      setPrice(editingItem.price.toString());
+      setDescription(editingItem.description || '');
+      setCategory(editingItem.category || 'Makanan');
+      setImageUrl(editingItem.imageUrl || '');
+      setIsAvailable(editingItem.isAvailable);
+      setShowAddForm(true); // Ensure form is open
+    } else {
+      // Reset form fields when not editing
+      setName('');
+      setPrice('');
+      setDescription('');
+      setCategory('Makanan'); // Default category
+      setImageUrl('');
+      setIsAvailable(true);
+    }
+  }, [editingItem]);
 
   useEffect(() => {
     if (!user?.venueId) {
@@ -162,7 +184,7 @@ export default function AdminMenu() {
     if (!name || !price) return setAlertConfig({ title: 'Peringatan', message: 'Nama item dan harga wajib diisi.' });
     if (!user?.venueId) return setAlertConfig({ title: 'Sesi Berakhir', message: 'ID venue tidak ditemukan. Silakan muat ulang halaman.' });
 
-    const { data, error } = await supabase.from('menu_items').insert([{
+    const itemData = {
       venue_id: user.venueId,
       name,
       price: parseFloat(price) || 0,
@@ -170,7 +192,18 @@ export default function AdminMenu() {
       category,
       image_url: imageUrl,
       is_available: isAvailable
-    }]).select().single();
+    };
+
+    let result;
+    if (editingItem) {
+      // Update existing item
+      result = await supabase.from('menu_items').update(itemData).eq('id', editingItem.id).select().single();
+    } else {
+      // Insert new item
+      result = await supabase.from('menu_items').insert([itemData]).select().single();
+    }
+
+    const { data, error } = result;
 
     if (error) {
       console.error('Supabase insert failed:', error);
@@ -190,7 +223,12 @@ export default function AdminMenu() {
       isAvailable: data.is_available
     };
 
-    setItems(prev => [newItem, ...prev]);
+    if (editingItem) {
+      setItems(prev => prev.map(it => it.id === processedItem.id ? processedItem : it));
+      setEditingItem(null); // Exit edit mode
+    } else {
+      setItems(prev => [processedItem, ...prev]);
+    }
     setFormSuccess(true);
     
     // Reset Form
@@ -199,6 +237,7 @@ export default function AdminMenu() {
     setDescription('');
     setImageUrl('');
     setIsAvailable(true);
+    setCategory('Makanan'); // Reset category to default
 
     setTimeout(() => {
       setFormSuccess(false);
@@ -319,6 +358,17 @@ export default function AdminMenu() {
                     </button>
 
                     <button
+                      id={`edit-stock-btn-${item.id}`}
+                      onClick={(e) => {
+                        e.stopPropagation(); // Prevent opening item details modal
+                        setEditingItem(item);
+                      }}
+                      className="text-slate-400 hover:text-indigo-600 p-1 rounded-md transition-colors cursor-pointer"
+                      title="Edit product"
+                    >
+                      <Pencil className="w-4 h-4" />
+                    </button>
+                    <button
                       id={`delete-stock-btn-${item.id}`}
                       onClick={() => setItemToDelete(item)}
                       className="text-slate-400 hover:text-rose-600 p-1 rounded-md transition-colors cursor-pointer"
@@ -373,10 +423,13 @@ export default function AdminMenu() {
                   <button 
                     id="dismiss-form-btn-2"
                     type="button" 
-                    onClick={() => setShowAddForm(false)} 
+                    onClick={() => {
+                      setShowAddForm(false);
+                      setEditingItem(null); // Always clear editing item on close
+                    }} 
                     className="text-xs text-slate-400 hover:text-slate-600 font-bold underline"
                   >
-                    Tutup
+                    {editingItem ? 'Batal' : 'Tutup'}
                   </button>
                 </div>
 
@@ -487,7 +540,7 @@ export default function AdminMenu() {
                   type="submit"
                   className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2.5 rounded-xl text-xs transition-colors shadow-xs cursor-pointer"
                 >
-                  Simpan
+                  {editingItem ? 'Update Item' : 'Simpan'}
                 </button>
               </form>
             ) : (
