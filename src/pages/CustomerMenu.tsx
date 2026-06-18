@@ -232,9 +232,7 @@ export default function CustomerMenu() {
     <div className="min-h-screen font-sans text-slate-900 pb-32" style={{ backgroundColor: theme.backgroundColor }}>
       {/* Header */}
       <header className="p-4 flex items-center justify-between backdrop-blur-md sticky top-0 z-30" style={{ backgroundColor: `${theme.backgroundColor}CC` }}>
-        <div className="w-8 h-8 rounded-full flex items-center justify-center text-white shadow-lg" style={{ backgroundColor: theme.primaryColor, boxShadow: `0 10px 15px -3px ${theme.primaryColor}33` }}>
-          <QrCode size={16} />
-        </div>
+        <img src="/Mid Valley.png" style={{ width: '60px', height: 'auto' }} />
         <button className="text-slate-400 p-2">
           <Search size={20} />
         </button>
@@ -244,7 +242,7 @@ export default function CustomerMenu() {
       <div className="px-5 py-2 space-y-1">
         <h1 className="text-2xl font-black text-slate-800 tracking-tight">{venueName}</h1>
         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-          Meja {tableDisplay} • {venue?.description || 'Grogol, Jakarta'}
+          Meja {tableDisplay}
         </p>
       </div>
 
