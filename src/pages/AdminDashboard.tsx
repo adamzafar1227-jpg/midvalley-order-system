@@ -12,8 +12,8 @@ import {
   Clock, 
   ChevronRight, 
   Plus,
+  LayoutGrid,
   ChefHat,
-  Table as TableIcon,
   TrendingUp,
   PackageCheck,
   ArrowUpRight
@@ -229,13 +229,13 @@ export default function AdminDashboard() {
   const getStatusBadge = (status: OrderStatus) => {
     switch (status) {
       case 'pending_payment':
-        return <span className="bg-amber-500/10 text-amber-500 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-amber-500/20 flex items-center gap-1">● Menunggu Pembayaran</span>;
+        return <span className="bg-[#FEF3C7] text-[#D97706] text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#FDE68A] flex items-center gap-1">● Menunggu Pembayaran</span>;
       case 'confirmed':
-        return <span className="bg-indigo-500/10 text-indigo-500 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-indigo-500/20 flex items-center gap-1">● Dikonfirmasi</span>;
+        return <span className="bg-[#DBEAFE] text-[#2563EB] text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#BFDBFE] flex items-center gap-1">● Dikonfirmasi</span>;
       case 'preparing':
         return <span className="bg-sky-500/10 text-sky-500 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-sky-500/20 flex items-center gap-1">● Sedang Diproses</span>;
       case 'ready':
-        return <span className="bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1">● Siap</span>;
+        return <span className="bg-[#DCFCE7] text-[#16A34A] text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-[#BBF7D0] flex items-center gap-1">● Siap</span>;
       case 'completed':
         return <span className="bg-emerald-500/10 text-emerald-500 text-[10px] font-bold uppercase tracking-wider px-2 py-0.5 rounded-full border border-emerald-500/20 flex items-center gap-1">● Selesai</span>;
       case 'cancelled':
@@ -291,14 +291,10 @@ export default function AdminDashboard() {
             </div>
             <div className="divide-y divide-slate-50">
               {orders.slice(0, 5).map(order => (
-                <div key={order.id} className="px-6 py-4 flex items-center justify-between hover:bg-slate-50/50 transition-colors">
+                <div key={order.id} className="px-6 py-4 flex items-center justify-between hover:bg-[#F9FAFB] transition-colors">
                   <div className="flex items-center gap-4">
                     <div className={`h-10 rounded-xl bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-600 px-3 min-w-[40px]`}>
-                      {order.tableId === 'Walk-in' ? (
-                        'WALK-IN'
-                      ) : (
-                        order.tableId
-                      )}
+                      {`Meja ${order.tableId.replace(/Table\s+/i, '').replace('Walk-in', '00')}`}
                     </div>
                     <div>
                       <div className="flex items-center gap-2">
@@ -315,8 +311,7 @@ export default function AdminDashboard() {
                     {order.status === 'pending_payment' && (
                       <button // Confirm Payment button
                         onClick={() => updateOrderStatus(order.id, 'confirmed')}
-                        className="text-white text-[10px] font-black px-3 py-1.5 rounded-lg transition-all active:scale-95 shadow-lg"
-                        style={{ backgroundColor: theme.primaryColor, boxShadow: `0 10px 15px -3px ${theme.primaryColor}33` }}
+                        className="bg-[#16A34A] text-white text-[13px] font-semibold px-4 py-2 rounded-lg transition-all active:scale-95 shadow-sm"
                       >
                         KONFIRMASI PEMBAYARAN
                       </button>
@@ -367,28 +362,28 @@ export default function AdminDashboard() {
             <div className="grid grid-cols-1 gap-3">
               <Link 
                 to="/admin/menu" 
-                className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all group border border-white/10"
+                className="flex items-center gap-2 p-4 rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all group border border-white/10"
               >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform" style={{ backgroundColor: `${theme.primaryColor}33`, color: theme.primaryColor }}>
-                  <Plus size={20} />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform" style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#FFFFFF' }}>
+                  <Plus size={18} />
                 </div>
                 <span className="text-sm font-bold">Tambah Menu</span>
               </Link>
               <Link 
                 to="/admin/tables" 
-                className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all group border border-white/10"
+                className="flex items-center gap-2 p-4 rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all group border border-white/10"
               >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform" style={{ backgroundColor: `${theme.primaryColor}33`, color: theme.primaryColor }}>
-                  <TableIcon size={20} />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform" style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#FFFFFF' }}>
+                  <LayoutGrid size={18} />
                 </div>
                 <span className="text-sm font-bold">Tambah Meja</span>
               </Link>
               <Link 
                 to="/admin/kitchen" 
-                className="flex items-center gap-3 p-4 rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all group border border-white/10"
+                className="flex items-center gap-2 p-4 rounded-2xl bg-white/5 hover:bg-white/10 text-white transition-all group border border-white/10"
               >
-                <div className="w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform" style={{ backgroundColor: `${theme.primaryColor}33`, color: theme.primaryColor }}>
-                  <ChefHat size={20} />
+                <div className="w-10 h-10 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform" style={{ backgroundColor: 'rgba(255,255,255,0.15)', color: '#FFFFFF' }}>
+                  <ChefHat size={18} />
                 </div>
                 <span className="text-sm font-bold">Lihat Dapur</span>
               </Link>

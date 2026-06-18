@@ -23,6 +23,7 @@ import {
   CartesianGrid 
 } from 'recharts';
 import jsPDF from 'jspdf';
+import { theme } from '../config/theme';
 
 export default function AdminReports() {
   const { user } = useAuth();
@@ -147,15 +148,15 @@ export default function AdminReports() {
     const pdf = new jsPDF('p', 'mm', 'a4');
     const pageWidth = pdf.internal.pageSize.getWidth();
     
-    // Header background (Brand Orange #FF6B35)
-    pdf.setFillColor(255, 107, 53);
+    // Header background
+    pdf.setFillColor(theme.primaryColor);
     pdf.rect(0, 0, pageWidth, 25, 'F');
     
     // Header text
     pdf.setTextColor(255, 255, 255);
     pdf.setFontSize(18);
     pdf.setFont('helvetica', 'bold');
-    pdf.text('Laporan Penjualan - Ordio', 14, 16);
+    pdf.text('Laporan Penjualan - ' + theme.brandName, 14, 16);
     
     // Header date
     pdf.setFontSize(10);
